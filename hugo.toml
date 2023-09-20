@@ -3,7 +3,6 @@ languageCode = 'en-us'
 title = 'Mehrdad Aksari Mahabadi'
 theme = "ezhil"
 
-
 copyright = "© Copyright notice" 
 
 # Enable syntax highlighting.  
@@ -15,7 +14,7 @@ pygmentscodefencesguesssyntax = true
 googleAnalytics = "UA-123-45" 
 
 # Your Disqus sortname.  
-disqusShortname = "localhost" 
+disqusShortname = "mehrdad-blog" 
 
 # Number of posts to show in recent posts list (Optional). Defaults to 10.  
 paginate = 10 
