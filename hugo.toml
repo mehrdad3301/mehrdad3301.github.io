@@ -30,7 +30,7 @@ summaryLength = 20
     mainSections = ["posts"]
 
     # Content types which are excludes Disqus comments.
-    disableDisqusTypes = ["page"]
+    disableDisqusTypes = ["page", "about", "resume"]
 
     # If social media links are enabled then enable this to fetch icons from CDN instead of hosted on your site.
     featherIconsCDN = true
