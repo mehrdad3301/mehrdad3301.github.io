@@ -4,16 +4,21 @@
 Amirkabir University of Technology (Tehran Polytechnic)\
 GPA: 3.94/4 
 
-### Teaching Exprience 
-- **Teaching Assistant** Design and Analysis of Algorithms\
-Amirkabir University of Technology -- Dr. Hamid Haj Seyed Javadi -- Fall 2022
-- **Teachig Assistant** Fundamentals of Computer Programming\
-Razi University -- Dr. Farzaneh Salari - Fall 2021
-- **Teaching Assistant** Fundamentals of Computer Programming\
-Amirkabir University of Technology -- Dr. Hossein Zeynali -- Fall 2021
+### Research Interests 
+- Geometric Deep Learning 
+- Knowledge Graphs 
+- Theoretical Computer Science 
+### Research Exprience 
+- AGM -- Sep 2023 - present 
+
+I've recently started working on Machine Learning on Graphs in AGM lab at Amirkabir University of Technology. 
+So far, I've read many influential papers in this domain and have developed technical skills by implementing 
+well-known GNN architectures such as GCN, GraphSage, and GAT in PyTorch Geometries. My main goal is to improve 
+MRR score on ogbl-biokg dataset in Open Graph Benchmark.
 
 ### Work Experience 
 - Snapp -- Feb 2023 - Present 
+
 Snapp is a leading company in the taxi services industry with over 30 million users. I work as
 a software engineer and am a member of the Routing team in Snapp’s map vertical. Here’s
 some of the things I’ve done so far
@@ -22,6 +27,15 @@ some of the things I’ve done so far
   - Worked collaboratively with other team members to improve the accuracy of the estimated time of arrival (ETA)
   - Read various research papers related to routing and navigation and gained a deeper understanding of the underlying algorithms
   - Implemented a simple routing engine to understand different routing algorithms, such as contraction heirarchies and A* with landmarks
+
+
+### Teaching Exprience 
+- **Teaching Assistant** Design and Analysis of Algorithms\
+Amirkabir University of Technology -- Dr. Hamid Haj Seyed Javadi -- Fall 2022
+- **Teachig Assistant** Fundamentals of Computer Programming\
+Razi University -- Dr. Farzaneh Salari - Fall 2021
+- **Teaching Assistant** Fundamentals of Computer Programming\
+Amirkabir University of Technology -- Dr. Hossein Zeynali -- Fall 2021
 
 ### Coursework and Technical Reports 
 - **Fuzzy Linear Algebra** \[[link](https://github.com/mehrdad3301/fuzzy-linear-algebra)\]\
@@ -76,7 +90,7 @@ implemented visual cryptography technique introduced by Adi Shamir and Moni Naor
 
 ### Skills 
 - **Programming Languages** Python, Go, Java, C, Bash
-- **Data Science** Numpy, Pandas, Matplotlib, Keras
+- **Data Science** PyTorch, PyTorch Geometries, Numpy, Pandas, Matplotlib, Keras
 - **Database** Postgres, Redis
 - **Monitoring** Prometheus, Grafana 
 - **Cloud/MLOps** Docker, Kubernetes
@@ -84,7 +98,7 @@ implemented visual cryptography technique introduced by Adi Shamir and Moni Naor
 
 ### Languages
 - **Farsi** Native 
-- **English** Full Proficiency  
+- **English** Full Proficiency (Toefl iBT 111) 
 
 
 
