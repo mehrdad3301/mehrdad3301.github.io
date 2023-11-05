@@ -14,7 +14,7 @@ pygmentscodefencesguesssyntax = true
 googleAnalytics = "UA-123-45" 
 
 # Your Disqus sortname.  
-disqusShortname = "mehrdad-blog" 
+disqusShortname = ""
 
 # Number of posts to show in recent posts list (Optional). Defaults to 10.  
 paginate = 10 
@@ -30,7 +30,7 @@ summaryLength = 20
     mainSections = ["posts"]
 
     # Content types which are excludes Disqus comments.
-    disableDisqusTypes = ["Home", "Tags", "Posts", "page", "About", "Resume"]
+    disableDisqusTypes = []
 
     # If social media links are enabled then enable this to fetch icons from CDN instead of hosted on your site.
     featherIconsCDN = true
