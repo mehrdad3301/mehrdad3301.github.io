@@ -2,9 +2,7 @@
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>Mehrdad Aksari Mahabadi</title>
   
-  <meta name="author" content="Arman Maesumi">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
 
 </head>
 
@@ -15,20 +13,12 @@
           <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
             <tr style="padding:0px">
               <td style="padding:2.5%;width:63%;vertical-align:middle">
-              <p class="name" style="text-align: center;">
-                Mehrdad Aksari Mahabadi 
-              </p>
+              <h1> Mehrdad Aksari Mahabadi </h1>
               <p>I'm studying computer science at Amirkabir University of Technology.</p>
-              <p>Previously I worked as a software engineer at Snapp. 
-                Snapp is the leading company in providing online taxi services with over 30 million users in Iran. 
-                As part of the Routing team, we were responsible for providing estimated time of arrival (ETA) and navigation services.
-                To this end, we integrated traffic data into our routing engines and enabled time-dependent routing, which significantly 
-                improved the accuracy of our ETA.  
-              </p>
               <p> 
-                I am also a member of the algorithms, graphs, and machine learning laboratory 
-                (AGM)
-                at Amirkabir University. Currently, the main focus of the lab is graph neural networks. We discuss the cutting edge research in this area during weekly sessions.
+                I'm broadly interested in machine learning. 
+                I'm interested in applying graph neural networks to biomedical domains such as drug discovery, drug interatcions, and drug repurposing. 
+                I'm also interested in trustworthy and reliable machine learning. 
               </p>
               <br>
               <div style="text-align:center;">
@@ -36,132 +26,73 @@
               </div>
             </td>
             <td style="width:40%;max-width:40%">
-              <img style="max-width:65%;border-radius:50%;" alt="profile photo" src="images/profile.jpg" class="hoverZoomLink">
+              <img style="max-width:65%;border-radius:50%;" alt="profile photo" src="assets/profile_3.jpg" class="hoverZoomLink">
             </td>
           </tr>
-        </tbody></table>
+        </tbody></table> 
+    <hr>
+    <div id="history" class="container">
 
-          <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
-              <tr>
-              <td style="padding:20px;width:100%;vertical-align:middle">
-                <h2>Projects</h2>
-              </td>
-            </tr>
-          </tbody></table>
-          <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+      <div class="entry row">
+        <div class="timespan">
+          Jun 2024 - </div> <div class="ico"> <div class="entry-dot"></div> <img src="assets/sharif_logo.png" /> </div> <div class="desc"> I currently work as a research intern in the machine learning laboratory (MLL) under the supervision of <a href="https://sharif.edu/~soleymani/">Dr. M. Soleymani Baghshah.</a> My main focus is on backdoor attacks in deep neural networks. We are working on a new attack that can hopefully circumvent state-of-the-art defenses.  </div> </div> <div class="entry row"> <div class="timespan"> Jan 2023 - Mar 2024 </div> <div class="ico"> <div class="entry-dot"></div> <img src="assets/snapp_logo.jpeg" /> </div> <div class="desc"> I worked as a software engineer at Snapp.  Snapp is the leading company in providing online taxi services with over 30 million users in Iran.  As part of the Routing team, we were responsible for providing estimated time of arrival (ETA) and navigation services.  <br> Here are some of the things I did: <ul> <li>Added a post-processing procedure to the map matching algorithm, which significantly improved map matcher's overall coverage. </li> <li>Integrated historical traffic speeds into the routing engine to enable time-dependent routing, which resulted in a huge boost in ETA accuracy.</li> <li>Redesigned and reimplemented ETA benchmarking service leveraging concurrency and message passing in the go programming language to increase service's throughput by x10.</li> </ul> </div> </div> <div class="entry row"> <div class="timespan"> Sep 2020 - Jan 2025 </div> <div class="ico"> <div class="entry-dot"></div> <img src="assets/logo_en.png" /> </div> <div class="desc"> BSc at the Amirkabir University of Technology (Tehran Polytechnic) majoring in computer science.  I ranked in the top three students on multiple occasions due to cumulative GPA. So far I have graded 18.78 / 20.  </div> </div> </div> <hr>
+    <div id="pet-projects" class="container">
+      <div class="ctitle">pet projects</div>
 
-          <tr>
-            <td style="padding:20px;width:10%;vertical-align:middle">
-              <img src="images/lunar_lander.gif"  width="200" style="border-style: none">
-            </td>
-            <td width="100%" valign="middle">
-            <strong>lunar lander</strong>
-              <br>
-              <a href="https://github.com/mehrdad3301/lunar-lander">project page</a> / <a href="">original paper</a>  
-              <p>In 2013, a deep learning model successfully learned control policy directly from high-dimensional sensory input.
-                The model was applied to seven Atari 2600 games from the Arcade Learning Environment. It surpassed human experts in four of them. Here I used the same method 
-              to learn to land on the moon ! </p>
-            </td>
-          </tr>
+      <div class="project">
+        <div class="pdesc"><a href="https://github.com/mehrdad3301/lunar-lander">Lunar Lander</a> 
+          In 2013, a deep learning model successfully learned control policy directly from high-dimensional sensory input.
+          The model was applied to seven Atari 2600 games from the Arcade Learning Environment. It surpassed human experts in four of them. Here I used the same method 
+          to learn to land on the moon ! 
+        </div> 
+        <div class="pend"></div>
+      </div>
 
-          <tr>
-            <td style="padding:20px;width:25%;vertical-align:middle">
-              <img src="images/evolution.gif" width="200" style="border-style: none">
-            </td>
-            <td width="75%" valign="middle">
-            <strong>Evolucop</strong>
-              <br>
-              <a href="https://github.com/mehrdad3301/EvoluCop">project page</a>  
-              <p> Evolucop is an evolutionary agent that masters a simplistic helicopter game. It uses a three layers neural net, to choose wether to push the helicopter. 
-                The challenge is in training the net. There are many ways to train a network that can solve this effectively. As the name suggests Evolocop uses Evolution. 
-              </p>
-            </td>
-          </tr>
+      <div class="project">
+        <div class="pdesc"><a href="https://github.com/mehrdad3301/EvoluCop">EvoluCop</a>
+          Evolucop is an evolutionary agent that masters a simplistic helicopter game. It uses a three layers neural net, to choose wether to push the helicopter. 
+          The challenge is in training the net. There are many ways to train a network that can solve this effectively. As the name suggests Evolocop uses Evolution. 
+        </div>
+        <div class="pend"></div>
+      </div>
 
+      <div class="project">
+        <div class="pico"></div>
+        <div class="pdesc">
+          <a href="https://github.com/mehrdad3301/diff-Net">Diff-Net</a>
+          is a tiny neural network framework that works with reverese mode automatic differentiation.
+        </div>
+        <div class="pend"></div>
+      </div>
 
-          <tr>
-            <td style="padding:20px;width:25%;vertical-align:right">
-              <img src="images/gan.gif" width="200" style="border-style: none">
-            </td>
-            <td width="20%" valign="middle">
-            <strong>Vanilla GAN</strong>
-              <br>
-              <a href="content/gan.html">project page</a>  
-              <p>
-                writing and training generative adverserial neural networks from scratch in Pytorch 
-              </p>
-            </td>
-          </tr>
+      <div class="project">
+        <div class="pico"></div>
+        <div class="pdesc">
+          <a href="https://github.com/mehrdad3301/visual-cryptography">visual cryptography</a>
+          is a cryptographic technique which allows visual image to be encrypted in such a way that the decrypted information is a visual image. 
+          here I implemented one of the best-known schemes is by Adi Shamir & Moni Naor developed 1994.
+        </div>
+        <div class="pend"></div>
+      </div>
 
-          <tr>
-            <td style="padding:20px;width:25%;vertical-align:middle">
-              <img src="images/eigen.png" width="200" style="border-style: none">
-            </td>
-            <td width="75%" valign="middle">
-            <strong>eigen digits</strong>
-              <br>
-              <a href="https://github.com/mehrdad3301/eigen-digits">project page</a>  
-              <p>
-                singular Value Decomposition (SVD) is a factorization of a matrix. In this report, we will show how to classify hand-written digits leveraging the aforementioned decomposition. 
-                In order to classify an image, we will see which principal component can best estimate the given image. 
-              </p>
-            </td>
-          </tr>
+      <div class="project">
+        <div class="pico"></div>
+        <div class="pdesc">
+          <a href="https://github.com/camel-lang/interpreter">camel</a>
+          is an interpreted programming language written in Golang. It supports arrays, dictionaries, conditional statements, functions, and closures. 
+        </div>
+        <div class="pend"></div>
+      </div>
 
-          <tr>
-            <td style="padding:5px;width:20%;vertical-align:right">
-              <img src="images/ann.gif" width="200" style="border-style: none">
-            </td>
-            <td width="75%" valign="middle">
-            <strong>ANN</strong>
-              <br>
-              <a href="https://github.com/mehrdad3301/ANN">project page</a>  
-              <p>
-                implementation of a simple artificial neural network framework in pure numpy  
-              </p>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="padding:20px;width:25%;vertical-align:middle">
-              <img src="images/cryptography.png" width="200" style="border-style: none">
-            </td>
-            <td width="25%" valign="middle">
-              <strong>visual cryptography</strong>
-              <br>
-              <a href="https://github.com/mehrdad3301/visual-cryptography">project page</a> / <a href="https://link.springer.com/content/pdf/10.1007/BFb0053419.pdf">original paper</a>  
-              </p>
-              <p>
-                Visual Cryptography is a cryptographic technique which allows visual image to be encrypted in such a way that the decrypted information is a visual image. 
-                One of the best-known schemes is by Adi Shamir & Moni Naor developed 1994.
-              </p>
-              <br>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="padding:5px;width:25%;vertical-align:right">
-              <img src="images/camel_lang.jpg" width="200" style="border-style: none">
-            </td>
-            <td width="75%" valign="middle">
-            <strong>Camel</strong>
-              <br>
-              <a href="https://github.com/camel-lang">project page</a>  
-              <p>
-                Camel is an interpreted programming language written in Golang
-              </p>
-            </td>
-          </tr>
+    <div class="container">
+      <div class="ctitle">misc unsorted</div>
+      <ul style="padding-left: 10px;">
+        <li>I have a brother. We are non-identical twins</li>
+        <li>In my free time, I go hiking and rock climbing.</li>
+        <li>0 frameworks were used to make this simple responsive website.</li>
+      </ul>
+    </div>
 
       </tbody></table>
-
-<table width="100%" align="center" border="0" cellspacing="0" cellpadding="20">
-  <tbody><tr> <td> <br>
-  <p align="right"><font size="2">
-  <a href="https://www.cs.berkeley.edu/~barron/">Template</a>
-  </td> </tr> </tbody> 
-  </table>
-    </tbody></table>
-</body>
 
 </html>
