@@ -14,14 +14,20 @@
             <tr style="padding:0px">
               <td style="padding:2.5%;width:63%;vertical-align:middle">
               <h1> Mehrdad Aksari Mahabadi </h1>
-              <p>I'm studying computer science at Amirkabir University of Technology.</p>
+              <p>I graduated from Amirkabir University of Technology with a degree in computer science.  
+                I am interested in a variety of topics, including distributed database systems, algorithms, and theoretical computer science. 
+                I enjoy implementing systems from scratch and optimizing them. 
+                <br>
+                <br>
+                I am currently working on predicting estimated time of arrivals at Snapp. I previously worked on robustness of deep learning models at Sharif University of Technology. 
+              </p>
               <br>
               <div style="text-align:center;">
                 <a href="https://www.github.com/mehrdad3301">GitHub</a> / <a href="https://www.linkedin.com/in/mehrdad-aksari-mahabadi">Linkedin</a> / <a href="mailto:makmahabadi@gmail.com">Mail</a>
               </div>
             </td>
             <td style="width:40%;max-width:40%">
-              <img style="max-width:65%;" alt="profile photo" src="assets/profile_3.jpg" class="hoverZoomLink">
+              <img style="max-width:65%;" alt="profile photo" src="assets/profile.jpeg" class="hoverZoomLink">
             </td>
           </tr>
         </tbody></table> 
@@ -29,16 +35,29 @@
     <div id="history" class="container">
 
       <div class="entry row"> 
+        <div class="timespan"> Jan 2025 </div> 
+          <div class="ico"> <div class="entry-dot"></div> <img src="assets/snapp_logo.jpeg" /> </div> 
+            <div class="desc"> I'm back trying new ideas to improve estimated time of arrivals (ETA). 
+            </div> 
+      </div> 
+
+      <div class="entry row"> <div class="timespan"> Jan 2024 Dec 2024</div> 
+        <div class="ico"> <div class="entry-dot"></div> <img src="assets/sharif_logo.png" /> </div> 
+          <div class="desc"> I worked on robustness of deep learning models at the Machine Learning Laboratory, Sharif University of Technology under the supervision of Dr. Mahdieh Soleymani.  
+          </div> 
+      </div> 
+
+      <div class="entry row"> 
         <div class="timespan"> Jan 2023 Mar 2024 </div> 
           <div class="ico"> <div class="entry-dot"></div> <img src="assets/snapp_logo.jpeg" /> </div> 
             <div class="desc"> I worked as a software engineer at Snapp.  
               	Snapp is the leading company in providing online taxi services with over 30 million users in Iran. As part of the Routing team, we were responsible for providing estimated time of arrival (ETA) and navigation services.
               <br> 
-              Here are some of the things I did: 
               <ul> 
-                <li>Added a post-processing procedure to the map matching algorithm, which significantly improved overall coverage.</li>
                 <li>Integrated traffic speeds into routing algorithms, enabling time-dependent routing.</li>
-                <li>Redesigned ETA benchmarking service leveraging concurrency, which increased throughput by x10.</li>
+                <li>Redesigned ETA benchmarking service leveraging concurrency, increasing throughput by x10.</li>
+                <li> Maintenance and development of the team's API gateway with up to 7K/RPS workload. 
+                  Key contributions include implementation of canary deployment, and hot reload of configurations. </li>
               </ul> 
             </div> 
       </div> 
@@ -46,20 +65,33 @@
       <div class="entry row"> <div class="timespan"> Sep 2020 Jan 2025 </div> 
         <div class="ico"> <div class="entry-dot"></div> <img src="assets/logo_en.png" /> </div> 
           <div class="desc"> BSc at the Amirkabir University of Technology (Tehran Polytechnic) majoring in computer science.  
-            I ranked in the top three students on multiple occasions due to cumulative GPA. So far I have graded 18.71 / 20.   
+            I ranked in the top three students on multiple occasions due to cumulative GPA. I graded 18.79 / 20.   
           </div> 
         </div> 
       </div> 
-  
+    </div>
   
   <hr>
+  <div id="teaching" class="container">
+  <div class="ctitle">teaching</div>
+    I was fortunate to be a teaching assistant for the following courses :
+    <ul style="padding-left: 40px;">
+      <li>Deep Learning (graduate course), Spring 2025, Sharif University of Technology</li>
+      <li>Computational Geometry, Fall 2024, Amirkabir University of Technology</li>
+      <li>Numerical Linear Algebra, Fall 2024, Amirkabir University of Technology</li>
+    </ul>
+  <hr>
+  </div>
 
-    <div id="pet-projects" class="container">
-      <div class="ctitle">pet projects</div>
+    <div id="projects" class="container">
+      <div class="ctitle">projects</div>
 
       <div class="project">
-        <div class="pdesc"><a href="https://github.com/mehrdad3301/EvoluCop">EvoluCopter</a>
-          is an evolutionary agent that masters a simplistic helicopter game using genetic algorithms and neural network.
+        <div class="pico"></div>
+        <div class="pdesc">
+          <a href="https://github.com/cmu-db/bustub">bustub</a>
+          is an educational relational database management system built at CMU. I implemented all the assignments of the project 
+          including thread-safe implementation of buffer pool manager, B+tree index, and query execution layer. The code is not publicly available due to course policies. 
         </div>
         <div class="pend"></div>
       </div>
@@ -68,16 +100,7 @@
         <div class="pico"></div>
         <div class="pdesc">
           <a href="https://github.com/camel-lang/interpreter">camel</a>
-          is an interpreted programming language written in Golang. It supports arrays, dictionaries, functions, and closures. 
-        </div>
-        <div class="pend"></div>
-      </div>
-      
-      <div class="project">
-        <div class="pico"></div>
-        <div class="pdesc">
-          <a href="https://github.com/mehrdad3301/JClash">JClash</a>
-          is a clone of the game Clash Royale in Java. 
+          is an interpreted programming language written in go. It supports arrays, dictionaries, functions, and closures. 
         </div>
         <div class="pend"></div>
       </div>
@@ -86,7 +109,32 @@
         <div class="pico"></div>
         <div class="pdesc">
           <a href="https://github.com/mehrdad3301/xv6-riscv">xv6</a>
-          	is a fork of xv6 operating system that supports copy-on-write and lazy page allocation.
+          	is a fork of MIT's xv6 operating system that implements copy-on-write and lazy page allocation.
+        </div>
+        <div class="pend"></div>
+      </div>
+
+      <div class="project">
+        <div class="pdesc"><a href="https://github.com/mehrdad3301/EvoluCop">evolucopter</a>
+          is an evolutionary agent that masters a simplistic helicopter game using genetic algorithms and neural network.
+        </div>
+        <div class="pend"></div>
+      </div>
+
+      <div class="project">
+        <div class="pdesc"><a href="https://github.com/mehrdad3301/JNotes">jnotes</a>
+          is my playground that contains deep neural network architecures, such as VAE, GAN, DDPM, RNN, LSTM and GPT, all implemented from scratch in pytorch. 
+        </div>
+        <div class="pend"></div>
+      </div>
+
+      
+      <div class="project">
+        <div class="pico"></div>
+        <div class="pdesc">
+          <a href="https://github.com/mehrdad3301/JClash">jclash</a>
+          is a clone of the game Clash Royale in Java. This was the final project of Advanced Programming course at Amirkabir University of Technology  
+          and my first real experience with programming. 
         </div>
         <div class="pend"></div>
       </div>
@@ -95,7 +143,8 @@
         <div class="pico"></div>
         <div class="pdesc">
           <a href="https://github.com/mehrdad3301/coyote">coyote</a>
-          is a routing engine that uses Dijkstra, A*, and ATL algorithms to compute the shortest path on a road network.
+          is a project that visualizes and compares Dijkstra, A*, and ATL algorithms to compute the shortest path on a road network. 
+          I implemented this for fun when I began working at Snapp. The end goal was to understand shortest path algorithms in more depth.
         </div>
         <div class="pend"></div>
       </div>
@@ -104,17 +153,19 @@
         <div class="pico"></div>
         <div class="pdesc">
           <a href="https://github.com/mehrdad3301/visual-cryptography">visual cryptography</a>
-          is a cryptographic technique which allows visual image to be encrypted in such a way that the decrypted information is a visual image. 
+          is a perfectly secure cryptographic scheme, which can decode concealed images without any cryptographic computations. 
+          I implemented this technique as an exercise in go programming language. 
         </div>
         <div class="pend"></div>
       </div>
+    </div>
 
     <div class="container">
       <div class="ctitle">misc unsorted</div>
-      <ul style="padding-left: 10px;">
+      <ul style="padding-left: 40px;">
         <li>I have a brother. We are non-identical twins</li>
         <li>In my free time, I go running, hiking, or climbing.</li>
-        <li>0 frameworks were used to make this simple responsive website.</li>
+        <li>This website design was inspired by <a href="https://karpathy.ai/">Andrej Karpathy</a>.</li>
       </ul>
     </div>
 
