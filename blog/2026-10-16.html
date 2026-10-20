@@ -121,7 +121,7 @@
 <span class="p">}</span>
 </code></pre></div>
 
-<p>The derived order on <code>RangeSortKey</code> struct compares the fields one by one, and the constants ensure that the ordering matches Postgres&rsquo;s ordering. </p>
+<p>The derived order on <code>RangeSortKey</code> struct compares the fields one by one. We will define some constants and initialize the struct to ensure that the ordering matches Postgres&rsquo;s ordering. </p>
 <div class="codehilite"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">EMPTY</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="k">const</span><span class="w"> </span><span class="n">NON_EMPTY</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
 <span class="k">const</span><span class="w"> </span><span class="n">LOWER_UNBOUNDED</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
@@ -134,7 +134,7 @@
 <span class="k">const</span><span class="w"> </span><span class="n">UPPER_INCLUSIVE</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
 </code></pre></div>
 
-<p>For instance, the all the inclusive lower bounds come before exclusive lower bounds, because <code>LOWER_INCLUSIVE: u8 = 0 &lt; LOWER_EXCLUSIVE: u8 = 1</code> matching Postgres&rsquo;s range comparison. The rest of the implementation details are in <code>src/index/reader/sort_by_range.rs</code>. </p>
+<p>For instance, all the inclusive lower bounds come before exclusive lower bounds, because <code>LOWER_INCLUSIVE: u8 = 0 &lt; LOWER_EXCLUSIVE: u8 = 1</code> matching Postgres&rsquo;s range comparison. The rest of the implementation details are in <code>src/index/reader/sort_by_range.rs</code>. </p>
 <p>Next, we modify <code>search_top_k_in_segments</code> in <code>src/index/reader/index.rs</code> to actually use the newly defined structs for Top-N: </p>
 <div class="codehilite"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="fm">matches!</span><span class="p">(</span><span class="n">field</span><span class="p">.</span><span class="n">field_type</span><span class="p">(),</span><span class="w"> </span><span class="n">SearchFieldType</span><span class="p">::</span><span class="n">Range</span><span class="p">(</span><span class="n">_</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">TopKSearchResults</span><span class="p">::</span><span class="n">new_for_discarded_field</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">top_in_segments</span><span class="p">(</span>
@@ -150,7 +150,7 @@
 </code></pre></div>
 
 <p>And that&rsquo;s it for the scan itself. The planner also has to agree that the range is sortable, and only when it is the first <code>ORDER BY</code> key, so <code>ORDER BY price, valid_period</code> still gets a Postgres <code>Sort</code>. You can read more about these details in the <a href="https://github.com/paradedb/paradedb/pull/5791">PR</a>. Let&rsquo;s look at how the query plan changed: </p>
-<p>The error above was the Top-N scan panicking. ParadeDB then stopped pushing the order down, so Postgres put a <code>Sort</code> on <code>valid_period</code> above a normal scan. The fix removes that <code>Sort</code>.</p>
+<p>The error above was the Top-N scan panicking. ParadeDB then stopped pushing the order down, so Postgres put a <code>Sort</code> on <code>valid_period</code> above a normal scan. The fix removes that <code>Sort</code> and pushs down the order by into Tantivity. </p>
 <p><img class="plan wide" src="../assets/plan-order-by-range.svg" alt="Before: Limit, then a Postgres Sort on valid_period, then a normal ParadeDB scan. After: Limit, then a Top-N ParadeDB scan ordered by valid_period."> </p>
 <p>Previously, the sorting was done by Postgres, because ParadeDB didn&rsquo;t use Top-N execution and only did the text search. The downside of this approach was that all rows must be sorted first before Postgres chooses the Top-10 records. With order by pushed down, only the Top-10 documents are materialized in Postgres, which makes things a lot faster!  </p>
 </div>
