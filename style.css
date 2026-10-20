@@ -42,6 +42,10 @@ body {
     margin: 40px auto 72px;
 }
 
+.page:has(.prose) {
+    width: min(980px, calc(100% - 48px));
+}
+
 a {
     color: var(--ink);
     text-underline-offset: 0.15em;
@@ -208,7 +212,7 @@ h1 {
 }
 
 .prose {
-    max-width: 40rem;
+    max-width: none;
 }
 
 .lede {
@@ -295,6 +299,15 @@ h1 {
     margin: 1rem 0;
 }
 
+.prose img.plan {
+    width: min(400px, 100%);
+    margin: 1.2rem auto;
+}
+
+.prose img.plan.wide {
+    width: min(640px, 100%);
+}
+
 .prose code {
     font-family: var(--mono);
     font-size: 0.86em;
@@ -312,6 +325,84 @@ h1 {
     font-size: 0.84rem;
 }
 
+.prose .codehilite {
+    margin: 1rem 0;
+}
+
+.prose .codehilite pre {
+    margin: 0;
+}
+
+.prose .codehilite .hll { background-color: #ffffcc }
+.prose .codehilite .c { color: #888 }
+.prose .codehilite .err { color: #F00; background-color: #FAA }
+.prose .codehilite .k { color: #080; font-weight: bold }
+.prose .codehilite .o { color: #333 }
+.prose .codehilite .ch { color: #888 }
+.prose .codehilite .cm { color: #888 }
+.prose .codehilite .cp { color: #579 }
+.prose .codehilite .cpf { color: #888 }
+.prose .codehilite .c1 { color: #888 }
+.prose .codehilite .cs { color: #C00; font-weight: bold }
+.prose .codehilite .gd { color: #A00000 }
+.prose .codehilite .ge { font-style: italic }
+.prose .codehilite .ges { font-weight: bold; font-style: italic }
+.prose .codehilite .gr { color: #F00 }
+.prose .codehilite .gh { color: #000080; font-weight: bold }
+.prose .codehilite .gi { color: #00A000 }
+.prose .codehilite .go { color: #888 }
+.prose .codehilite .gp { color: #C65D09; font-weight: bold }
+.prose .codehilite .gs { font-weight: bold }
+.prose .codehilite .gu { color: #800080; font-weight: bold }
+.prose .codehilite .gt { color: #04D }
+.prose .codehilite .kc { color: #080; font-weight: bold }
+.prose .codehilite .kd { color: #080; font-weight: bold }
+.prose .codehilite .kn { color: #080; font-weight: bold }
+.prose .codehilite .kp { color: #038; font-weight: bold }
+.prose .codehilite .kr { color: #080; font-weight: bold }
+.prose .codehilite .kt { color: #339; font-weight: bold }
+.prose .codehilite .m { color: #60E; font-weight: bold }
+.prose .codehilite .s,
+.prose .codehilite .sa,
+.prose .codehilite .sb,
+.prose .codehilite .dl,
+.prose .codehilite .s2,
+.prose .codehilite .sh,
+.prose .codehilite .s1 { color: #BA2121; background-color: #FFF0F0 }
+.prose .codehilite .na { color: #00C }
+.prose .codehilite .nb { color: #007020 }
+.prose .codehilite .nc { color: #B06; font-weight: bold }
+.prose .codehilite .no { color: #036; font-weight: bold }
+.prose .codehilite .nd { color: #555; font-weight: bold }
+.prose .codehilite .ni { color: #800; font-weight: bold }
+.prose .codehilite .ne { color: #F00; font-weight: bold }
+.prose .codehilite .nf { color: #06B; font-weight: bold }
+.prose .codehilite .nl { color: #970; font-weight: bold }
+.prose .codehilite .nn { color: #0E84B5; font-weight: bold }
+.prose .codehilite .nt { color: #070 }
+.prose .codehilite .nv { color: #963 }
+.prose .codehilite .ow { color: #000; font-weight: bold }
+.prose .codehilite .w { color: #BBB }
+.prose .codehilite .mb { color: #60E; font-weight: bold }
+.prose .codehilite .mf { color: #60E; font-weight: bold }
+.prose .codehilite .mh { color: #058; font-weight: bold }
+.prose .codehilite .mi { color: #00D; font-weight: bold }
+.prose .codehilite .mo { color: #40E; font-weight: bold }
+.prose .codehilite .sc { color: #04D }
+.prose .codehilite .sd { color: #D42; font-style: italic }
+.prose .codehilite .se { color: #666; font-weight: bold; background-color: #FFF0F0 }
+.prose .codehilite .si { background-color: #EEE }
+.prose .codehilite .sx { color: #D20; background-color: #FFF0F0 }
+.prose .codehilite .sr { color: #000; background-color: #FFF0FF }
+.prose .codehilite .ss { color: #A60 }
+.prose .codehilite .bp { color: #007020 }
+.prose .codehilite .fm { color: #06B; font-weight: bold }
+.prose .codehilite .vc { color: #369 }
+.prose .codehilite .vg { color: #D70; font-weight: bold }
+.prose .codehilite .vi { color: #33B }
+.prose .codehilite .vm { color: #963 }
+.prose .codehilite .il { color: #00D; font-weight: bold }
+
 .prose table {
     width: 100%;
     border-collapse: collapse;
@@ -324,6 +415,74 @@ h1 {
     border-bottom: 1px solid var(--line);
     text-align: left;
     vertical-align: top;
+}
+
+.prose .cornell {
+    width: calc(100vw - 64px);
+    margin: 1.4rem 0 1.6rem;
+    margin-left: calc(50% - 50vw + 32px);
+    margin-right: calc(50% - 50vw + 32px);
+    border-top: 2px solid var(--ink);
+}
+
+.prose .cornell-source {
+    margin: 0;
+    padding: 0.65rem 0;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.prose .cornell-pair {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    column-gap: 0.85rem;
+}
+
+.prose .cue {
+    padding: 0.85rem 1rem 0.85rem 0;
+    border-right: 2px solid var(--ink);
+    color: #555;
+}
+
+.prose .note {
+    padding: 0.85rem 1.5rem 0.85rem 0;
+}
+
+.prose .cornell-summary {
+    padding: 0.9rem 1.5rem 0.1rem 0;
+    border-top: 2px solid var(--ink);
+}
+
+.prose .cornell p,
+.prose .cornell li {
+    hyphens: manual;
+    text-align: left;
+    text-align-last: auto;
+}
+
+.prose .note p,
+.prose .note li,
+.prose .cornell-summary p {
+    hyphens: auto;
+    text-align: justify;
+    text-align-last: left;
+}
+
+.prose .cue p,
+.prose .note p,
+.prose .cornell-summary p {
+    margin: 0 0 0.55em;
+}
+
+.prose .cue p:last-child,
+.prose .note p:last-child,
+.prose .cornell-summary p:last-child {
+    margin-bottom: 0;
+}
+
+.prose .note ul,
+.prose .note ol {
+    margin: 0.35rem 0 0.15rem;
 }
 
 .back {
@@ -383,5 +542,32 @@ h1 {
     .prose li {
         hyphens: manual;
         text-align: left;
+    }
+
+    .prose .cornell {
+        width: auto;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .prose .cornell-pair {
+        grid-template-columns: 1fr;
+    }
+
+    .prose .note p,
+    .prose .note li,
+    .prose .cornell-summary p {
+        hyphens: manual;
+        text-align: left;
+    }
+
+    .prose .cue {
+        padding: 0.75rem 0 0;
+        border-right: 0;
+        font-size: 15px;
+    }
+
+    .prose .note {
+        padding: 0.3rem 0 0.8rem;
     }
 }

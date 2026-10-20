@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="300" viewBox="0 0 640 300" role="img" aria-label="Before: Limit, then a Postgres Sort on valid_period, then a normal ParadeDB scan. After: Limit, then a Top-N ParadeDB scan ordered by valid_period.">
+  <rect width="640" height="300" fill="#f8f8f8"/>
+  <g fill="#f8f8f8" stroke="#1e1e1e" stroke-width="1.8">
+    <rect x="70" y="36" width="170" height="40"/>
+    <rect x="50" y="104" width="210" height="56"/>
+    <rect x="24" y="188" width="262" height="88"/>
+    <rect x="400" y="36" width="170" height="40"/>
+    <rect x="354" y="104" width="262" height="172"/>
+  </g>
+  <path d="M155 76 v24" fill="none" stroke="#1e1e1e" stroke-width="1.8"/>
+  <path d="M155 100 l-5 -9 h10z" fill="#1e1e1e"/>
+  <path d="M155 160 v24" fill="none" stroke="#1e1e1e" stroke-width="1.8"/>
+  <path d="M155 184 l-5 -9 h10z" fill="#1e1e1e"/>
+  <path d="M485 76 v24" fill="none" stroke="#1e1e1e" stroke-width="1.8"/>
+  <path d="M485 100 l-5 -9 h10z" fill="#1e1e1e"/>
+  <g font-family="Segoe Print, Comic Sans MS, Chalkboard SE, cursive" fill="#1e1e1e" text-anchor="middle">
+    <text x="155" y="24" font-size="16">before</text>
+    <text x="155" y="62" font-size="16">Limit</text>
+    <text x="155" y="128" font-size="16">Sort</text>
+    <text x="155" y="148" font-size="14">valid_period</text>
+    <text x="155" y="216" font-size="16">Custom Scan</text>
+    <text x="155" y="238" font-size="14">NormalScanExecState</text>
+    <text x="155" y="258" font-size="14">text search</text>
+    <text x="485" y="24" font-size="16">after</text>
+    <text x="485" y="62" font-size="16">Limit</text>
+    <text x="485" y="140" font-size="16">Custom Scan</text>
+    <text x="485" y="166" font-size="14">TopKScanExecState</text>
+    <text x="485" y="190" font-size="14">valid_period asc</text>
+    <text x="485" y="214" font-size="14">TopK Limit: 10</text>
+  </g>
+</svg>

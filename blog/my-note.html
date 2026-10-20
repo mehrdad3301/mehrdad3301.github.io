@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f8f8">
+  <title>What is ParadeDB and how I made a contribution — Mehrdad Aksari Mahabadi</title>
+  <meta name="description" content="Dive into ParadeDB internal working">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <div class="page">
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="index.html" aria-current="page">Blog</a>
+    </nav>
+    <main id="content" class="prose">
+    <article>
+      <p class="post-date">October 16, 2026</p>
+      <h1>What is ParadeDB and how I made a contribution</h1>
+      <div class="cornell">
+<div class="cornell-pair">
+<div class="cue">
+<p>Intro to ParadeDB </p>
+</div>
+<div class="note">
+<p>I was just searching through <a href="https://dbdb.io">dbdb.io</a>, and came across <a href="https://github.com/paradedb/paradedb">ParadeDB</a> by accident. Simply said, ParadeDB brings full-text search capabilities to your existing PostgreSQL database.</p>
+<p>Traditionally, software companies keep two services, one is usually an OLTP database like PostgreSQL to injest data from the clients, and another is a separate search engine, like Elasticsearch, for full-text search queries. These two services are connected through an <a href="https://en.wikipedia.org/wiki/Extract,_transform,_load">ETL pipeline</a>. The cost is in maintaining two services, and sometimes having stale data to query.</p>
+<p>ParadeDB is a PostgreSQL extension that tries to solve search differently. It uses <a href="https://github.com/pgcentralfoundation/pgrx">pgrx</a> to be able to write PostgreSQL extensions in Rust and instead of writing a search engine from scratch, ParadeDB uses <a href="https://github.com/quickwit-oss/tantivy">Tantivy</a>, which is a rewrite of <a href="https://en.wikipedia.org/wiki/Apache_Lucene">Lucene</a>, famous search engine Elasticsearch uses, in Rust. The last component is <a href="https://github.com/apache/datafusion">Apache DataFusion</a>. Normally, people want to derive some analytics from the text being search, and ParadeDB uses DataFusion, which is a query engine (again in Rust), to run the analytical queries. I really like how the authors decided to compose ParadeDB from already existing components and trying to make them work togther, rather than building everything from scratch! </p>
+<p>In reality it is a lot more complicated than what it looks like on the surface. In this blog post, I take a dive into ParadeDB&rsquo;s codebase to understand some of its internal components, and then explain how I made a small contribution. </p>
+</div>
+</div>
+<div class="cornell-pair">
+<div class="cue">
+<p>Life of a query in ParadeDB </p>
+</div>
+<div class="note">
+<p>Let&rsquo;s explain how an extension is written in PostgreSQL by looking at a simple query from ParadeDB.</p>
+<div class="codehilite"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">description</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">mock_items</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="o">@@@</span><span class="w"> </span><span class="s1">'running shoes'</span><span class="p">;</span>
+</code></pre></div>
+
+<p>The <code>@@@</code> is ParadeDB&rsquo;s search operator and it&rsquo;s not part of SQL, so ParadeDB must first register it into Postgres&rsquo;s catalog, and associate it with a function, such that whenever Postgres sees <code>@@@</code>, it knows what function to call. This registration happens when <code>CREATE EXTENSION pg_search</code> statement is run in SQL. If you are curious where/how this function is implemented, you can take a look at the <code>atatat.rs</code> operator inside <code>src/api/operator</code> directory. </p>
+<div class="codehilite"><pre><span></span><code><span class="cp">#[pg_operator(immutable, parallel_safe, cost = 1000000000)]</span>
+<span class="cp">#[opname(pg_catalog.@@@)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">search_with_parse</span><span class="p">(</span><span class="n">_element</span><span class="p">:</span><span class="w"> </span><span class="nc">AnyElement</span><span class="p">,</span><span class="w"> </span><span class="n">query</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="fm">panic!</span><span class="p">(</span><span class="s">"query is incompatible with pg_search's `@@@(field, TEXT)` operator: `{query}`"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The implementation panics! That&rsquo;s because ParadeDB never wants to run this function, and instead uses super fast tantivity indexes. The definition is only here so that we can write <code>@@@</code> in our SQL statement. You can see in the pgrx macro the cost of calling this function is <code>1000000000</code> per row. That way ParadeDB makes sure that this function is never called. </p>
+<p>But how is the actual search performed? Let&rsquo;s first look at the query plan for this simple query in Postgres.</p>
+<p><img class="plan" src="../assets/plan-sequential.svg" alt="EXPLAIN plan: a projection of id and description, then a filter on description @@@ 'running shoes', then a sequential scan of mock_items"></p>
+<p>ParadeDB replaces the sequential scan, which would run the <code>@@@</code> function per each record, with a <code>CustomScan</code>.</p>
+<p><img class="plan" src="../assets/plan-custom-scan.svg" alt="EXPLAIN plan: a projection of id and description, then a ParadeDB Base Scan whose Tantivy query is running shoes"> </p>
+<p>A <code>CustomScan</code> in Postgres is a node in query plan that the extension owns. Think about it this way: each node produces some rows, that its parent consumes. When Postgres reaches a <code>CustomScan</code> it delegates the job of producing rows to the extension. </p>
+<p>Let&rsquo;s next see the details of how this is done. Postgres has multiple ways, or paths, of running the query. The planner, a.k.a optimizer, calculates the cost associated with each path and then chooses the cheapest. ParadeDB registers <code>set_rel_pathlist_hook</code> hook, that during Postgres planning calls back <code>paradedb_rel_pathlist_callback</code> and adds ParadeDB&rsquo;s custom path to the pool of paths in Postgres. If that path is chosen, the custom scan in ParadeDB gets executed. Remember we set the cost of the <code>@@@</code> operator to <code>1000000000</code> per row. That makes a sequential scan that would call this function look enormously expensive, so the custom path wins when ParadeDB has added one. </p>
+<p>To see how everything works in the code you can check <code>src/postgres/customscan/basescan/mod.rs</code>, which contains the implementations of <code>CustomScan</code> trait. After the custom path is created and chosen by the planner, <code>exec_custom_scan</code> is called to execute the custom path. This function queries the tantivity index to retrieve the results. </p>
+</div>
+</div>
+<div class="cornell-pair">
+<div class="cue">
+<p>Tantivy under the hood </p>
+</div>
+<div class="note">
+<p>Let&rsquo;s briefly discuss what inverted indexes are and how Tantivy works internally. ParadeDB stores each indexed Postgres row as one Tantivy document. The document holds the searchable text and the row&rsquo;s <code>ctid</code>, which is that row&rsquo;s address in the heap. For instance the ctid (2, 3) points to the third page and the third slot in that page, since page numbers start at 0. The index over these documents is inverted: each term points at the documents that contain it.</p>
+<p><img class="plan" src="../assets/tantivy-inverted.svg" alt="Two rows, (0,1) red running shoes and (0,2) leather shoes, and the inverted index that maps red, running, shoes, and leather to those ctids"></p>
+<p>A search for <code>running shoes</code> splits the query into the same kind of terms, for instance <code>running</code> and <code>shoes</code>, looks up each term&rsquo;s list of ctids, and keeps a document that contains at least one of them. ParadeDB then reads that document&rsquo;s <code>ctid</code> and fetches the row from Postgres. </p>
+<p>It seems simple on the surface, but under the hood it&rsquo;s quite complex. Tantivy groups indexes into segments, and a background job merges them and garbage collects obsolete records. To make things more complex, ParadeDB adds mutable segments to Tantivity, quite similar to log structured merge trees. </p>
+<p><img class="plan wide" src="../assets/tantivy-segments.svg" alt="Two mutable segments stacked on two immutable segments, with an arrow from one immutable segment to its inverted index"></p>
+<p>Lastly, lets dig deeper into one of Tantivity&rsquo;s optimizations and learn how it efficiently executes Top-N queries, which is very common form in text search queries. Each document in Tantivity can have many fields other than the indexed field. For example, an index could be built on &ldquo;description&rdquo; field, while the document contains other fields, such as &ldquo;size&rdquo; or &ldquo;date created&rdquo; alongside the index. Tantivity can store other fields in a <a href="https://en.wikipedia.org/wiki/Data_orientation">columnar format</a> in the same order as the documents. The position in that column is the document id, so document 2 in the inverted index is also position 2 in the <code>size</code> column. The fields created this way are called &ldquo;fast fields&rdquo; in Tantivity. Fast fields allows Tantivity to access fields, other than the index to do things like sorting. The main advantage of fast fields is that they allow Tantivity to do the sorting without the need to retrieve the entire document, which makes sorting cheaper. </p>
+<p>To make things more concrete consider a Top-N query. Building on our previous example, lets say we want to order the shoes by &ldquo;size&rdquo; and take the Top-10. Tantivity walks every match in a segment and pushes that document id, together with its size, into the segment&rsquo;s heap. The heap keeps only the ten largest. A second heap merges them, and it records the segment as well, because document 2 on the left is a different shoe from document 2 on the right. Schematically, this is how it looks like: </p>
+<p><img class="plan wide" src="../assets/tantivy-topn.svg" alt="Each segment lines size up under the document id. The segment heaps keep those ids, and the merged top 10 also records the segment"> </p>
+</div>
+</div>
+<div class="cornell-pair">
+<div class="cue">
+<p>The problem: order by range! </p>
+</div>
+<div class="note">
+<p>Postgres supports ranges. For example <code>tstzrange('2023-01-01', '2023-02-01')</code> is a range that basically means every timestamp from the first instant up to, but not including, the second. Interestingly, Postgres also supports sorting by a range. It first tries to order the records by the lower bound and then the upper bound. Lets now consider a Top-N query in ParadeDB that orders by a range: </p>
+<p><a href="https://github.com/paradedb/paradedb/issues/2688">Issue 2688</a> is this query:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">category</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">data_records</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="o">@@@</span><span class="w"> </span><span class="s1">'product'</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">valid_period</span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+</code></pre></div>
+
+<p>Where <code>valid_period</code> is a <code>tstzrange</code> like <code>tstzrange('2023-01-01', '2023-02-01')</code>. If you previously ran this query, you&rsquo;d get the following error in ParadeDB: </p>
+<div class="codehilite"><pre><span></span><code>ERROR:  should be able to collect top-n in segment: SchemaError("Fast field not available: '\"valid_period\"'")
+</code></pre></div>
+
+<p>ParadeDB tried to retrieve Top-10 from Tantivity, but Tantivity didn&rsquo;t have any fast fields for <code>valid_period</code>. That&rsquo;s because Tantivity treats ranges as json with the following schema: </p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"lower"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-01-01"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"upper"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-02-01"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"empty"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"lower_inclusive"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"upper_inclusive"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"lower_unbounded"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"upper_unbounded"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Tantivity stores each field in this json separately as a fast field. To fix this problem, we need to implement the Postgres <code>range_cmp</code> inside ParadeDB. We first define the following struct, which maps to how Tantivity stores each range json: </p>
+<div class="codehilite"><pre><span></span><code><span class="cp">#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">RangeSortKey</span><span class="o">&lt;</span><span class="n">V</span><span class="p">:</span><span class="w"> </span><span class="nb">Ord</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">empty</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="p">,</span>
+<span class="w">    </span><span class="n">lower_bounded</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="p">,</span>
+<span class="w">    </span><span class="n">lower</span><span class="p">:</span><span class="w"> </span><span class="nb">Option</span><span class="o">&lt;</span><span class="n">V</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">lower_inclusive</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="p">,</span>
+<span class="w">    </span><span class="n">upper_bounded</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="p">,</span>
+<span class="w">    </span><span class="n">upper</span><span class="p">:</span><span class="w"> </span><span class="nb">Option</span><span class="o">&lt;</span><span class="n">V</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">upper_inclusive</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The derived order on <code>RangeSortKey</code> struct compares the fields one by one, and the constants ensure that the ordering matches Postgres&rsquo;s ordering. </p>
+<div class="codehilite"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">EMPTY</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="n">NON_EMPTY</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="n">LOWER_UNBOUNDED</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="n">LOWER_FINITE</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="n">LOWER_INCLUSIVE</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="n">LOWER_EXCLUSIVE</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="n">UPPER_FINITE</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="n">UPPER_UNBOUNDED</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="n">UPPER_EXCLUSIVE</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="n">UPPER_INCLUSIVE</span><span class="p">:</span><span class="w"> </span><span class="kt">u8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+
+<p>For instance, the all the inclusive lower bounds come before exclusive lower bounds, because <code>LOWER_INCLUSIVE: u8 = 0 &lt; LOWER_EXCLUSIVE: u8 = 1</code> matching Postgres&rsquo;s range comparison. The rest of the implementation details are in <code>src/index/reader/sort_by_range.rs</code>. </p>
+<p>Next, we modify <code>search_top_k_in_segments</code> in <code>src/index/reader/index.rs</code> to actually use the newly defined structs for Top-N: </p>
+<div class="codehilite"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="fm">matches!</span><span class="p">(</span><span class="n">field</span><span class="p">.</span><span class="n">field_type</span><span class="p">(),</span><span class="w"> </span><span class="n">SearchFieldType</span><span class="p">::</span><span class="n">Range</span><span class="p">(</span><span class="n">_</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">TopKSearchResults</span><span class="p">::</span><span class="n">new_for_discarded_field</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">top_in_segments</span><span class="p">(</span>
+<span class="w">        </span><span class="n">segment_ids</span><span class="p">,</span>
+<span class="w">        </span><span class="p">(</span><span class="n">SortByRange</span><span class="p">::</span><span class="n">for_field</span><span class="p">(</span><span class="n">sort_field</span><span class="p">),</span><span class="w"> </span><span class="n">order</span><span class="p">),</span>
+<span class="w">        </span><span class="n">erased_features</span><span class="p">,</span>
+<span class="w">        </span><span class="n">n</span><span class="p">,</span>
+<span class="w">        </span><span class="n">offset</span><span class="p">,</span>
+<span class="w">        </span><span class="n">aux_collector</span><span class="p">,</span>
+<span class="w">    </span><span class="p">))</span>
+<span class="w">    </span><span class="p">.</span><span class="n">into</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>And that&rsquo;s it for the scan itself. The planner also has to agree that the range is sortable, and only when it is the first <code>ORDER BY</code> key, so <code>ORDER BY price, valid_period</code> still gets a Postgres <code>Sort</code>. You can read more about these details in the <a href="https://github.com/paradedb/paradedb/pull/5791">PR</a>. Let&rsquo;s look at how the query plan changed: </p>
+<p>The error above was the Top-N scan panicking. ParadeDB then stopped pushing the order down, so Postgres put a <code>Sort</code> on <code>valid_period</code> above a normal scan. The fix removes that <code>Sort</code>.</p>
+<p><img class="plan wide" src="../assets/plan-order-by-range.svg" alt="Before: Limit, then a Postgres Sort on valid_period, then a normal ParadeDB scan. After: Limit, then a Top-N ParadeDB scan ordered by valid_period."> </p>
+<p>Previously, the sorting was done by Postgres, because ParadeDB didn&rsquo;t use Top-N execution and only did the text search. The downside of this approach was that all rows must be sorted first before Postgres chooses the Top-10 records. With order by pushed down, only the Top-10 documents are materialized in Postgres, which makes things a lot faster!  </p>
+</div>
+</div>
+<div class="cornell-summary">
+<p><strong>Summary.</strong> ParadeDB takes the idea of composable database systems seriously with Postgres at its core, Tantivity for search, Datafusion for analytics, joined together with pgrx. In this post, I tried to explain how these different part work together while also getting into some of the internals in more details, but this was the tip of the iceberge! </p>
+</div>
+</div>
+    </article>
+    <p class="back"><a href="index.html">All posts</a></p>
+    </main>
+  </div>
+</body>
+</html>

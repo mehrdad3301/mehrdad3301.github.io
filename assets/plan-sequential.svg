@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250" role="img" aria-label="EXPLAIN plan: projection, filter, then a sequential scan">
+  <rect width="400" height="250" fill="#f8f8f8"/>
+  <g fill="none" stroke="#1e1e1e" stroke-width="1.8" stroke-linejoin="round">
+    <path d="M70 12 h260 q8 1 9 8 v42 q-1 8 -9 9 H70 q-9 -1 -9 -9 V20 q1 -8 9 -8z" fill="#f8f8f8"/>
+    <path d="M200 72 v16"/>
+    <path d="M200 88 l-5 -8 h10z" fill="#1e1e1e" stroke="none"/>
+    <path d="M48 96 h304 q9 1 10 8 v58 q-1 9 -10 9 H48 q-9 0 -10 -9 v-58 q1 -8 10 -8z" fill="#f8f8f8"/>
+    <path d="M200 172 v16"/>
+    <path d="M200 188 l-5 -8 h10z" fill="#1e1e1e" stroke="none"/>
+    <path d="M62 196 h276 q8 0 9 8 v32 q0 8 -9 9 H62 q-8 -1 -9 -9 v-32 q1 -8 9 -8z" fill="#f8f8f8"/>
+  </g>
+  <g font-family="Segoe Print, Comic Sans MS, Chalkboard SE, cursive" fill="#1e1e1e" text-anchor="middle">
+    <text x="200" y="36" font-size="16">Projection</text>
+    <text x="200" y="56" font-size="13">id, description</text>
+    <text x="200" y="120" font-size="16">Filter</text>
+    <text x="200" y="140" font-size="13">description @@@ 'running shoes'</text>
+    <text x="200" y="220" font-size="16">Seq Scan on mock_items</text>
+  </g>
+</svg>

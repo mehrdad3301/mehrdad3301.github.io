@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="270" viewBox="0 0 640 270" role="img" aria-label="Mutable segments stacked on immutable segments, with one immutable segment opened onto its inverted index">
+  <rect width="640" height="270" fill="#f8f8f8"/>
+  <g fill="#f8f8f8" stroke="#1e1e1e" stroke-width="1.8">
+    <rect x="172" y="12" width="140" height="52"/>
+    <rect x="328" y="12" width="140" height="52"/>
+    <rect x="172" y="72" width="140" height="52"/>
+    <rect x="328" y="72" width="140" height="52"/>
+    <rect x="180" y="156" width="280" height="100"/>
+  </g>
+  <path d="M242 124 v22" fill="none" stroke="#1e1e1e" stroke-width="1.8"/>
+  <path d="M242 146 l-5 -9 h10z" fill="#1e1e1e"/>
+  <g font-family="Segoe Print, Comic Sans MS, Chalkboard SE, cursive" fill="#1e1e1e" text-anchor="middle" font-size="15">
+    <text x="242" y="44">mutable</text>
+    <text x="398" y="44">mutable</text>
+    <text x="242" y="104">immutable</text>
+    <text x="398" y="104">immutable</text>
+    <text x="320" y="180">inverted index</text>
+  </g>
+  <g font-family="Segoe Print, Comic Sans MS, Chalkboard SE, cursive" fill="#1e1e1e" font-size="14">
+    <text x="214" y="206">red</text>
+    <text x="310" y="206">-&gt; (0,1)</text>
+    <text x="214" y="228">running</text>
+    <text x="310" y="228">-&gt; (0,1)</text>
+    <text x="214" y="250">shoes</text>
+    <text x="310" y="250">-&gt; (0,1), (0,2)</text>
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300" role="img" aria-label="Documents and the inverted index that maps each term to ctids">
+  <rect width="400" height="300" fill="#f8f8f8"/>
+  <g fill="none" stroke="#1e1e1e" stroke-width="1.8" stroke-linejoin="round">
+    <path d="M48 12 h304 q9 1 10 8 v78 q-1 9 -10 9 H48 q-9 0 -10 -9 V20 q1 -8 10 -8z" fill="#f8f8f8"/>
+    <path d="M200 108 v16"/>
+    <path d="M200 124 l-5 -8 h10z" fill="#1e1e1e" stroke="none"/>
+    <path d="M36 132 h328 q9 1 10 9 v124 q-1 9 -10 10 H36 q-9 -1 -10 -10 V141 q1 -9 10 -9z" fill="#f8f8f8"/>
+  </g>
+  <g font-family="Segoe Print, Comic Sans MS, Chalkboard SE, cursive" fill="#1e1e1e">
+    <text x="200" y="34" font-size="16" text-anchor="middle">documents</text>
+    <text x="78" y="60" font-size="14">(0,1)</text>
+    <text x="150" y="60" font-size="14">red running shoes</text>
+    <text x="78" y="84" font-size="14">(0,2)</text>
+    <text x="150" y="84" font-size="14">leather shoes</text>
+    <text x="200" y="158" font-size="16" text-anchor="middle">inverted index</text>
+    <text x="78" y="186" font-size="14">red</text>
+    <text x="190" y="186" font-size="14">-&gt; (0,1)</text>
+    <text x="78" y="210" font-size="14">running</text>
+    <text x="190" y="210" font-size="14">-&gt; (0,1)</text>
+    <text x="78" y="234" font-size="14">shoes</text>
+    <text x="190" y="234" font-size="14">-&gt; (0,1), (0,2)</text>
+    <text x="78" y="258" font-size="14">leather</text>
+    <text x="190" y="258" font-size="14">-&gt; (0,2)</text>
+  </g>
+</svg>

@@ -13,10 +13,11 @@ Write a post as posts/my-title.md:
     such as assets/photo.png.
 
 Set draft: true to keep a post out of the build.
+posts/template.md is a Cornell notes draft. Copy it for a new post.
 
     python3 scripts/build_blog.py
 
-The first run creates .venv and installs the Markdown package there.
+The first run creates .venv and installs Markdown and Pygments there.
 """
 
 from __future__ import annotations
@@ -36,7 +37,7 @@ def venv_has_markdown() -> bool:
     if not VENV_PYTHON.exists():
         return False
     probe = subprocess.run(
-        [str(VENV_PYTHON), "-c", "import markdown"],
+        [str(VENV_PYTHON), "-c", "import markdown, pygments"],
         capture_output=True,
     )
     return probe.returncode == 0
@@ -45,11 +46,14 @@ def venv_has_markdown() -> bool:
 def ensure_markdown():
     try:
         import markdown
+        import pygments  # noqa: F401
     except ImportError:
         if not venv_has_markdown():
             if not VENV_PYTHON.exists():
                 subprocess.check_call([sys.executable, "-m", "venv", ROOT / ".venv"])
-            subprocess.check_call([str(VENV_PYTHON), "-m", "pip", "install", "markdown>=3.5"])
+            subprocess.check_call(
+                [str(VENV_PYTHON), "-m", "pip", "install", "markdown>=3.5", "pygments>=2.18"]
+            )
         os_exec()
     return markdown
 
@@ -72,7 +76,14 @@ FONTS = (
 )
 
 MD = markdown.Markdown(
-    extensions=["fenced_code", "tables", "smarty", "sane_lists", "footnotes"],
+    extensions=["fenced_code", "codehilite", "tables", "smarty", "sane_lists", "footnotes", "md_in_html"],
+    extension_configs={
+        "codehilite": {
+            "guess_lang": False,
+            "noclasses": False,
+            "pygments_style": "colorful",
+        }
+    },
     output_format="html",
 )
 
