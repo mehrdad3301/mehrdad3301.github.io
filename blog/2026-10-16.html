@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f8f8">
-  <title>What is ParadeDB and how I made a contribution — Mehrdad Aksari Mahabadi</title>
+  <title>ParadeDB internals, and the ORDER BY query I fixed — Mehrdad Aksari Mahabadi</title>
   <meta name="description" content="Dive into ParadeDB internal working">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
     <main id="content" class="prose">
     <article>
       <p class="post-date">October 16, 2026</p>
-      <h1>What is ParadeDB and how I made a contribution</h1>
+      <h1>ParadeDB internals, and the ORDER BY query I fixed</h1>
       <div class="cornell">
 <div class="cornell-pair">
 <div class="cue">
@@ -83,7 +83,7 @@
 <p>The problem: order by range! </p>
 </div>
 <div class="note">
-<p>Postgres supports ranges. For example <code>tstzrange('2023-01-01', '2023-02-01')</code> is a range that basically means every timestamp from the first instant up to, but not including, the second. Interestingly, Postgres also supports sorting by a range. It first tries to order the records by the lower bound and then the upper bound. Lets now consider a Top-N query in ParadeDB that orders by a range: </p>
+<p>Lets finally explain what the issue in <code>ORDER BY</code> was. Postgres supports ranges. For example <code>tstzrange('2023-01-01', '2023-02-01')</code> is a range that basically means every timestamp from the first instant up to, but not including, the second. Interestingly, Postgres also supports sorting by a range. It first tries to order the records by the lower bound and then the upper bound. Lets now consider a Top-N query in ParadeDB that orders by a range: </p>
 <p><a href="https://github.com/paradedb/paradedb/issues/2688">Issue 2688</a> is this query:</p>
 <div class="codehilite"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">category</span>
 <span class="k">FROM</span><span class="w"> </span><span class="n">data_records</span>
