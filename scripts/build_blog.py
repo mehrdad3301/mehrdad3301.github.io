@@ -170,6 +170,8 @@ def shell(title: str, description: str, main: str, current: str) -> str:
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="__FONTS__" rel="stylesheet">
   <link rel="stylesheet" href="__CSS__">
+  <script data-goatcounter="https://makmahabadi.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
   <a class="skip" href="#content">Skip to content</a>
