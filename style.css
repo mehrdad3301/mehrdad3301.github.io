@@ -230,24 +230,24 @@ h1 {
     margin: 0 0 1.15rem;
 }
 
-.post-list h2 {
+.post-list li h2 {
     margin: 0.1rem 0 0.25rem;
     font-size: 20px;
     font-weight: 700;
     line-height: 1.35;
 }
 
-.post-list h2 a {
+.post-list li h2 a {
     color: var(--ink);
 }
 
-.post-list p {
+.post-list li p {
     margin: 0;
     color: #555;
 }
 
-.post-date {
-    margin: 0;
+.post-list .post-date {
+    margin: 0 0 0.15rem;
     font-size: 14px;
     color: #999;
 }
