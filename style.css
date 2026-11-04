@@ -308,6 +308,14 @@ h1 {
     width: min(640px, 100%);
 }
 
+.prose img + em {
+    display: block;
+    max-width: 640px;
+    margin: 0 auto;          /* center the caption under wide images */
+    text-align: center;
+    font-size: 0.78em;
+}
+
 .prose code {
     font-family: var(--mono);
     font-size: 0.86em;

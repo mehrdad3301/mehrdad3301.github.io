@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="700" viewBox="0 0 1400 700">
+  <defs>
+    <filter id="rough" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="17" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="pointer-arrow" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto">
+      <path d="M0 0 L8 4.5 L0 9 z" fill="#ef4444"/>
+    </marker>
+  </defs>
+  <style>
+    .base { font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; fill:#172033; }
+    .route { fill: none; stroke: #ea580c; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+    .node { fill: #fff; stroke: #334155; stroke-width: 2.1; }
+    .nodeText { font-size: 14px; font-weight: 650; fill: #172033; text-anchor: middle; }
+  </style>
+  <rect width="1400" height="700" fill="#f8f8f8"/>
+
+  <g filter="url(#rough)">
+    <path class="route" d="M100 600 C 180 550, 300 500, 440 480 C 560 460, 680 480, 800 450 C 920 420, 1040 400, 1160 370 C 1270 340, 1280 290, 1290 250" />
+  </g>
+  <g filter="url(#rough)">
+    <circle cx="100" cy="600" r="11" class="node"/>
+    <circle cx="700" cy="460" r="11" class="node"/>
+    <circle cx="900" cy="420" r="11" class="node"/>
+    <circle cx="1290" cy="250" r="11" class="node"/>
+  </g>
+  <text class="base nodeText" x="100" y="604">S</text>
+  <text class="base nodeText" x="700" y="464">v</text>
+  <text class="base nodeText" x="900" y="424">w</text>
+  <text class="base nodeText" x="1290" y="254">T</text>
+
+  <g filter="url(#rough)">
+    <line x1="925" y1="285" x2="890" y2="405" stroke="#ef4444" stroke-width="2.3" marker-end="url(#pointer-arrow)"/>
+  </g>
+  <text class="base" x="905" y="260" font-size="27">Now at t₀ + 1h, use speeds from t₀ + 1h</text>
+</svg>
