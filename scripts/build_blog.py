@@ -69,6 +69,8 @@ markdown = ensure_markdown()
 POSTS_DIR = ROOT / "posts"
 BLOG_DIR = ROOT / "blog"
 LEDE = "Notes on things I am trying to understand."
+SITE = "https://mehrdad3301.github.io"
+SITE_NAME = "Mehrdad Aksari Mahabadi"
 
 FONTS = (
     "https://fonts.googleapis.com/css2?"
@@ -121,6 +123,8 @@ def parse_post(path: Path) -> dict:
         "title": meta["title"],
         "date": published,
         "summary": meta.get("summary", ""),
+        "description": meta.get("description", "") or meta.get("summary", ""),
+        "image": meta.get("image", ""),
         "draft": meta.get("draft", "").lower() in {"true", "yes", "1"},
         "slug": slug,
         "body": parts[2].strip() + "\n",
@@ -155,7 +159,51 @@ def format_date(published: date) -> str:
     return f"{published:%B} {published.day}, {published.year}"
 
 
-def shell(title: str, description: str, main: str, current: str) -> str:
+def social_meta(
+    og_title: str,
+    description: str,
+    url: str = "",
+    image: str = "",
+    og_type: str = "website",
+) -> str:
+    """Open Graph + Twitter Card tags so shared links render rich previews."""
+    lines = [
+        f'  <meta property="og:site_name" content="{SITE_NAME}">',
+        f'  <meta property="og:type" content="{og_type}">',
+        f'  <meta property="og:title" content="{html.escape(og_title)}">',
+        f'  <meta property="og:description" content="{html.escape(description)}">',
+    ]
+    if url:
+        lines.append(f'  <meta property="og:url" content="{SITE}/{url}">')
+    if image:
+        lines += [
+            f'  <meta property="og:image" content="{SITE}/{image}">',
+            f'  <meta property="og:image:width" content="1200">',
+            f'  <meta property="og:image:height" content="630">',
+            '  <meta name="twitter:card" content="summary_large_image">',
+            f'  <meta name="twitter:title" content="{html.escape(og_title)}">',
+            f'  <meta name="twitter:description" content="{html.escape(description)}">',
+            f'  <meta name="twitter:image" content="{SITE}/{image}">',
+        ]
+    else:
+        lines += [
+            '  <meta name="twitter:card" content="summary">',
+            f'  <meta name="twitter:title" content="{html.escape(og_title)}">',
+            f'  <meta name="twitter:description" content="{html.escape(description)}">',
+        ]
+    return "\n".join(lines) + "\n"
+
+
+def shell(
+    title: str,
+    description: str,
+    main: str,
+    current: str,
+    url: str = "",
+    og_title: str = "",
+    image: str = "",
+    og_type: str = "website",
+) -> str:
     home_current = ' aria-current="page"' if current == "home" else ""
     blog_current = ' aria-current="page"' if current == "blog" else ""
     template = """<!DOCTYPE html>
@@ -166,6 +214,8 @@ def shell(title: str, description: str, main: str, current: str) -> str:
   <meta name="theme-color" content="#f8f8f8">
   <title>__TITLE__</title>
   <meta name="description" content="__DESCRIPTION__">
+  <link rel="canonical" href="__CANONICAL__">
+__SOCIAL__
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="__FONTS__" rel="stylesheet">
@@ -190,6 +240,8 @@ __MAIN__
     return (
         template.replace("__TITLE__", html.escape(title))
         .replace("__DESCRIPTION__", html.escape(description))
+        .replace("__CANONICAL__", f"{SITE}/{url}" if url else SITE + "/")
+        .replace("__SOCIAL__", social_meta(og_title or title, description, url, image, og_type).rstrip("\n"))
         .replace("__FONTS__", FONTS)
         .replace("__CSS__", rel("style.css"))
         .replace("__HOME__", rel("index.html"))
@@ -223,11 +275,18 @@ def render_index(posts: list[dict]) -> str:
         '    <h1 class="page-title">Blog</h1>\n'
         f'    <p class="lede">{html.escape(LEDE)}</p>{listing}'
     )
-    return shell("Blog — Mehrdad Aksari Mahabadi", LEDE, main, "blog")
+    return shell(
+        "Blog — Mehrdad Aksari Mahabadi",
+        LEDE,
+        main,
+        "blog",
+        url="blog/",
+        og_title="Blog",
+    )
 
 
 def render_post(post: dict) -> str:
-    description = post["summary"] or post["title"]
+    description = post["description"] or post["title"]
     main = (
         "    <article>\n"
         f'      <p class="post-date">{format_date(post["date"])}</p>\n'
@@ -237,7 +296,39 @@ def render_post(post: dict) -> str:
         '    <p class="back"><a href="index.html">All posts</a></p>'
     )
     title = f"{post['title']} — Mehrdad Aksari Mahabadi"
-    return shell(title, description, main, "blog")
+    return shell(
+        title,
+        description,
+        main,
+        "blog",
+        url=f"blog/{post['slug']}.html",
+        og_title=post["title"],
+        image=post["image"],
+        og_type="article",
+    )
+
+
+def render_sitemap(posts: list[dict]) -> str:
+    latest = max((post["date"] for post in posts), default=date.today())
+    urls = [("", latest.isoformat()), ("blog/", latest.isoformat())]
+    for post in posts:
+        urls.append((f"blog/{post['slug']}.html", post["date"].isoformat()))
+    lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ]
+    for loc, lastmod in urls:
+        lines += [
+            "  <url>",
+            f"    <loc>{SITE}/{loc}</loc>",
+            f"    <lastmod>{lastmod}</lastmod>",
+            "  </url>",
+        ]
+    lines.append("</urlset>")
+    return "\n".join(lines) + "\n"
+
+
+ROBOTS = f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n"
 
 
 def main() -> None:
@@ -252,7 +343,10 @@ def main() -> None:
     for stale in BLOG_DIR.glob("*.html"):
         if stale.name not in keep:
             stale.unlink()
+    (ROOT / "sitemap.xml").write_text(render_sitemap(posts), encoding="utf-8")
+    (ROOT / "robots.txt").write_text(ROBOTS, encoding="utf-8")
     print(f"Built {len(posts)} post{'s' if len(posts) != 1 else ''} into {BLOG_DIR}")
+    print(f"Wrote sitemap.xml and robots.txt into {ROOT}")
 
 
 if __name__ == "__main__":

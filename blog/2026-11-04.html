@@ -5,7 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f8f8">
   <title>Challenges in calculating ETA at scale — Mehrdad Aksari Mahabadi</title>
-  <meta name="description" content="Challenges in calculating ETA at scale">
+  <meta name="description" content="From Dijkstra to Contraction Hierarchies: how shortest-path algorithms power ride-hailing ETAs, visualized on a real road network.">
+  <link rel="canonical" href="https://mehrdad3301.github.io/blog/2026-11-04.html">
+  <meta property="og:site_name" content="Mehrdad Aksari Mahabadi">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Challenges in calculating ETA at scale">
+  <meta property="og:description" content="From Dijkstra to Contraction Hierarchies: how shortest-path algorithms power ride-hailing ETAs, visualized on a real road network.">
+  <meta property="og:url" content="https://mehrdad3301.github.io/blog/2026-11-04.html">
+  <meta property="og:image" content="https://mehrdad3301.github.io/assets/og-eta.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Challenges in calculating ETA at scale">
+  <meta name="twitter:description" content="From Dijkstra to Contraction Hierarchies: how shortest-path algorithms power ride-hailing ETAs, visualized on a real road network.">
+  <meta name="twitter:image" content="https://mehrdad3301.github.io/assets/og-eta.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet">
@@ -71,7 +84,7 @@
 </div>
 <div class="note">
 <p>There are some nuances that we didn&rsquo;t take into consideration. Lets say we wanna calculate the shortest path between two points that are far away by hours. When we start our journey, we might know that a particular road currently allows us to drive at 100 km/h. But by the time we actually reach that road, an hour or two later, traffic conditions might have changed. Maybe there&rsquo;s congestion, or maybe traffic has cleared up. In other words, we need to be able to look into future/historical speeds for the time slice other than the current timestamp. </p>
-<p>Another problem is with turn restrictions. It&rsquo;s not always allowed to take a right/left/U-turn, and it&rsquo;s not easy to represent this in normal graphs where nodes are intersections and edges connect nodes. To do that we need an edge-based graph, where nodes represent streets and edges represent turns. You can check out the picture below to see how a node-based representation of a road intersection is transformed to an edge-based representation. All the algorithms we studied need to be adjusted to work with the new graph and that's not always trivial to do.</p>
+<p>Another problem is with turn restrictions. It&rsquo;s not always allowed to take a right/left/U-turn, and it&rsquo;s not easy to represent this in normal graphs where nodes are intersections and edges connect nodes. To do that we need an edge-based graph, where nodes represent streets and edge represent turns, and all the shortest path algorithms we studied so far must be adjusted. </p>
 <p><img class="plan wide" src="../assets/eta-turn-models.png" alt="eta-visualization/turn-models.png">
 <em>Image from <a href="https://drops.dagstuhl.de/storage/01oasics/oasics-vol085-atmos2020/OASIcs.ATMOS.2020.9/OASIcs.ATMOS.2020.9.pdf">Customizable Contraction Hierarchies with Turn Costs</a> — Buchhold, Wagner, Zeitz &amp; Zündorf.</em></p>
 <p>So far, we just looked at calculating a single ETA, but many use cases need a batch of ETAs, for example calculating ETAs from all the passengers to all the drivers in an area. This is obviously more computationally demanding, and requires algorithms that are faster than simply calculating ETA for each source and destination one step at a time. </p>
