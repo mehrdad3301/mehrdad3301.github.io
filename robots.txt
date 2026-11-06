@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mehrdad3301.github.io/sitemap.xml
+Sitemap: https://mehrdadmahabadi.com/sitemap.xml

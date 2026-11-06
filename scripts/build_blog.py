@@ -13,6 +13,7 @@ Write a post as posts/my-title.md:
     such as assets/photo.png.
 
 Set draft: true to keep a post out of the build.
+Set redirect_from: old-slug to keep an old URL working after a rename.
 posts/template.md is a Cornell notes draft. Copy it for a new post.
 
     python3 scripts/build_blog.py
@@ -23,6 +24,7 @@ The first run creates .venv and installs Markdown and Pygments there.
 from __future__ import annotations
 
 import html
+import json
 import re
 import subprocess
 import sys
@@ -69,8 +71,9 @@ markdown = ensure_markdown()
 POSTS_DIR = ROOT / "posts"
 BLOG_DIR = ROOT / "blog"
 LEDE = "Notes on things I am trying to understand."
-SITE = "https://mehrdad3301.github.io"
+SITE = "https://mehrdadmahabadi.com"
 SITE_NAME = "Mehrdad Aksari Mahabadi"
+TITLE_NAME = "Mehrdad A. Mahabadi"
 
 FONTS = (
     "https://fonts.googleapis.com/css2?"
@@ -126,6 +129,7 @@ def parse_post(path: Path) -> dict:
         "description": meta.get("description", "") or meta.get("summary", ""),
         "image": meta.get("image", ""),
         "draft": meta.get("draft", "").lower() in {"true", "yes", "1"},
+        "redirect_from": meta.get("redirect_from", ""),
         "slug": slug,
         "body": parts[2].strip() + "\n",
         "source": path.name,
@@ -194,6 +198,23 @@ def social_meta(
     return "\n".join(lines) + "\n"
 
 
+def post_json_ld(post: dict, description: str) -> str:
+    """BlogPosting structured data so search engines can attribute the post."""
+    data = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": post["title"],
+        "description": description,
+        "datePublished": post["date"].isoformat(),
+        "url": f"{SITE}/blog/{post['slug']}.html",
+        "author": {"@type": "Person", "name": SITE_NAME, "url": f"{SITE}/"},
+    }
+    if post["image"]:
+        data["image"] = f"{SITE}/{post['image']}"
+    payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
+    return f'  <script type="application/ld+json">{payload}</script>'
+
+
 def shell(
     title: str,
     description: str,
@@ -203,6 +224,7 @@ def shell(
     og_title: str = "",
     image: str = "",
     og_type: str = "website",
+    json_ld: str = "",
 ) -> str:
     home_current = ' aria-current="page"' if current == "home" else ""
     blog_current = ' aria-current="page"' if current == "blog" else ""
@@ -241,7 +263,11 @@ __MAIN__
         template.replace("__TITLE__", html.escape(title))
         .replace("__DESCRIPTION__", html.escape(description))
         .replace("__CANONICAL__", f"{SITE}/{url}" if url else SITE + "/")
-        .replace("__SOCIAL__", social_meta(og_title or title, description, url, image, og_type).rstrip("\n"))
+        .replace(
+            "__SOCIAL__",
+            social_meta(og_title or title, description, url, image, og_type).rstrip("\n")
+            + (f"\n{json_ld}" if json_ld else ""),
+        )
         .replace("__FONTS__", FONTS)
         .replace("__CSS__", rel("style.css"))
         .replace("__HOME__", rel("index.html"))
@@ -276,7 +302,7 @@ def render_index(posts: list[dict]) -> str:
         f'    <p class="lede">{html.escape(LEDE)}</p>{listing}'
     )
     return shell(
-        "Blog — Mehrdad Aksari Mahabadi",
+        f"Blog — {TITLE_NAME}",
         LEDE,
         main,
         "blog",
@@ -295,7 +321,7 @@ def render_post(post: dict) -> str:
         "    </article>\n"
         '    <p class="back"><a href="index.html">All posts</a></p>'
     )
-    title = f"{post['title']} — Mehrdad Aksari Mahabadi"
+    title = f"{post['title']} — {TITLE_NAME}"
     return shell(
         title,
         description,
@@ -305,7 +331,25 @@ def render_post(post: dict) -> str:
         og_title=post["title"],
         image=post["image"],
         og_type="article",
+        json_ld=post_json_ld(post, description),
     )
+
+
+def render_redirect(post: dict) -> str:
+    target = f"{SITE}/blog/{post['slug']}.html"
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{html.escape(post['title'])}</title>
+  <link rel="canonical" href="{target}">
+  <meta http-equiv="refresh" content="0; url={target}">
+</head>
+<body>
+  <p>This post has moved to <a href="{target}">{html.escape(post['title'])}</a>.</p>
+</body>
+</html>
+"""
 
 
 def render_sitemap(posts: list[dict]) -> str:
@@ -340,6 +384,10 @@ def main() -> None:
         name = f"{post['slug']}.html"
         keep.add(name)
         (BLOG_DIR / name).write_text(render_post(post), encoding="utf-8")
+        if post["redirect_from"]:
+            old_name = f"{post['redirect_from']}.html"
+            keep.add(old_name)
+            (BLOG_DIR / old_name).write_text(render_redirect(post), encoding="utf-8")
     for stale in BLOG_DIR.glob("*.html"):
         if stale.name not in keep:
             stale.unlink()

@@ -2,101 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f8f8f8">
-  <title>Challenges in calculating ETA at scale — Mehrdad Aksari Mahabadi</title>
-  <meta name="description" content="From Dijkstra to Contraction Hierarchies: how shortest-path algorithms power ride-hailing ETAs, visualized on a real road network.">
-  <link rel="canonical" href="https://mehrdad3301.github.io/blog/2026-11-04.html">
-  <meta property="og:site_name" content="Mehrdad Aksari Mahabadi">
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="Challenges in calculating ETA at scale">
-  <meta property="og:description" content="From Dijkstra to Contraction Hierarchies: how shortest-path algorithms power ride-hailing ETAs, visualized on a real road network.">
-  <meta property="og:url" content="https://mehrdad3301.github.io/blog/2026-11-04.html">
-  <meta property="og:image" content="https://mehrdad3301.github.io/assets/og-eta.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Challenges in calculating ETA at scale">
-  <meta name="twitter:description" content="From Dijkstra to Contraction Hierarchies: how shortest-path algorithms power ride-hailing ETAs, visualized on a real road network.">
-  <meta name="twitter:image" content="https://mehrdad3301.github.io/assets/og-eta.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../style.css">
-  <script data-goatcounter="https://makmahabadi.goatcounter.com/count"
-          async src="//gc.zgo.at/count.js"></script>
+  <title>Challenges in calculating ETA at scale</title>
+  <link rel="canonical" href="https://mehrdadmahabadi.com/blog/eta-at-scale.html">
+  <meta http-equiv="refresh" content="0; url=https://mehrdadmahabadi.com/blog/eta-at-scale.html">
 </head>
 <body>
-  <a class="skip" href="#content">Skip to content</a>
-  <div class="page">
-    <nav class="site-nav" aria-label="Site">
-      <a href="../index.html">Home</a>
-      <a href="index.html" aria-current="page">Blog</a>
-    </nav>
-    <main id="content" class="prose">
-    <article>
-      <p class="post-date">November 4, 2026</p>
-      <h1>Challenges in calculating ETA at scale</h1>
-      <div class="cornell">
-<div class="cornell-pair">
-<div class="cue">
-<p>why Uber calls ETA the billion-dollar problem? </p>
-</div>
-<div class="note">
-<p>In this post, I&rsquo;ll be talking about calculating estimated time of arrivals (ETA). I&rsquo;ll first explain why this is an important problem across various domains. Then explore different approaches to calculating ETA and elaborate on where they fall short. I hope by the end of it you get a little insight into the challenges involved. It&rsquo;s always nice to dive deep into a problem to understand all the nitty gritty details that goes into building real-world systems.</p>
-<p>Uber called ETA <a href="https://www.uber.com/blog/deepeta-how-uber-predicts-arrival-times/">a billion dollar problem</a>. From an outsider point of view ETA should just effect user experience, but there&rsquo;s a lot more to it. </p>
-<p>For starters, user experience is important! Consider the following scenario: if a ride hailing company always underestimates the ETA, people will eventually stop trusting the numbers. As a side effect, they may cancel the ride, simply because they suspect it takes the driver a longer time to pick up the passenger than what&rsquo;s shown on the app. Less rides, less cash flow. </p>
-<p>But user experience is just the beginning. In order to assign drivers to passengers, ride hailing companies are faced with a <a href="https://www.uber.com/us/en/marketplace/matching/">matching problem</a>: How to match a passenger to a driver? To solve this optimization problem, we need an objective function. The goal could be decreasing wait time for passengers and helping drivers secure more rides. For that, we need to know the time it takes for each driver to reach a passenger.</p>
-<p>This is why Uber calls ETA the billion dollar problem, but ETA is not limited to ride-hailing. Many problems in logistics are directly related to ETA. For instance consider a food or post delivery service. In this scenario, we are concerned with finding the optimal routes for a fleet of vehicles serving customers, subject to some constraints like time windows and vehicle capacity. we need to know which vehicle to assign to which deliveries and in what order stops should be made. Similar to ride-hailing&rsquo;s matching problem, we wanna minimize customers wait time, and maximize the number of deliveries. To solve this optimization problem, we need the ETA again.  </p>
-</div>
-</div>
-<div class="cornell-pair">
-<div class="cue">
-<p>How ETA is calculated?</p>
-</div>
-<div class="note">
-<p>If you studied computer science, at some point in your curriculum you read about shortest path algorithms like <a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm">Dijkstra</a>. Dijkstra can be used to calculate the ETA, but it&rsquo;s gonna be extremely slow, and not gonna scale to a road network with million of nodes and edges. Dijkstra expands outward from the source in every direction, like a growing circle, until it reaches the destination. Just look at the search space explored by Dijkstra: </p>
-<p><img class="plan wide" src="../assets/eta-dijkstra.gif" alt="eta-visualization/dijkstra.gif"></p>
-<p><a href="https://en.wikipedia.org/wiki/A*_search_algorithm">A*</a> can significantly restrict Dijkstra&rsquo;s search space by adding a heuristic, an estimate of the remaining cost from the current node to the destination. Still, it&rsquo;s gonna be super slow in real-world road networks. </p>
-<p><img class="plan wide" src="../assets/eta-astar.gif" alt="eta-visualization/astar.gif"></p>
-<p>Another thing that could be done to make things faster is to search backwards from the destinations, while searching forward from the source at the same time. It&rsquo;s a very simple idea, but it can improve the response time significantly: </p>
-<p><img class="plan wide" src="../assets/eta-bidirectional-astar.gif" alt="eta-visualization/bidirectional-astar.gif"></p>
-<p>There are other algorithms, that do some preprocessing to build an even more restrictive heuristic for A<em>, like <a href="https://www.microsoft.com/en-us/research/publication/computing-the-shortest-path-a-search-meets-graph-theory/">ALT</a> (A</em>, landmarks and triangle inequality). ALT chooses a number of landmarks, and calculates the ETA from, and to, the landmarks for each node in the graph. Then, from the triangle inequality, we know that the time it takes to get from any node to destination is less than the time it takes to get from that node to any landmark and from the landmark to the destination. This more restrictive heuristic can drastically change A* performance: </p>
-<p><img class="plan wide" src="../assets/eta-alt.gif" alt="eta-visualization/alt.gif"></p>
-<p>We can still do better by doing more preprocessing. <a href="https://en.wikipedia.org/wiki/Contraction_hierarchies">Contraction Hierarchies</a> is an algorithms that takes the idea of preprocessing one step further. Conceptually, it takes the hierarchical structure of route networks into account, and ranks each node, while adding some shortcuts. During query time, it only allows the hops to the nodes higher in the hierarchy, which significantly reduces the search space. Think about it this way: when we are headed to a destination, we first try to get on the highway, drive all the way near the destination and then get off the high way. To understand how correctness is ensured and the low-level details of how this works, you can follow this awesome <a href="https://jlazarsfeld.github.io/ch.150.project/sections/1-intro/">page</a>, but visually this is how it&rsquo;s gonna look like: 
-<img class="plan wide" src="../assets/eta-contraction-hierarchies.gif" alt="eta-visualization/contraction-hierarchies.gif"></p>
-</div>
-</div>
-<div class="cornell-pair">
-<div class="cue">
-<p>Preprocess vs Query time Trade-off </p>
-</div>
-<div class="note">
-<p>By now you might have realized that the more we preprocess the less the query time will be. At one extreme, we can compute all the shortest path pairs and save them, so that during the query we will only have to do a table lookup! On the other hand Dijkstra has no preprocessing step. 
-<img class="plan wide" src="../assets/eta-preprocessing-vs-query-time.png" alt="Screenshot 2026-11-04 at 13.27.55.png">
-<em>Image from <a href="https://arxiv.org/abs/1504.05140">Route Planning in Transportation Networks</a> — Delling, Goldberg, Pajor &amp; Werneck.</em></p>
-<p>So what&rsquo;s the trade-off here? Can&rsquo;t we just do preprocessing once in the beginning and be done with it? The problem is that road networks are changing all the time. We calculated the visualization using a static snapshot of Openstreetmaps data, but in reality roads become congested and traffic fluctuates in road segments. Ideally, our algorithm should adapt to these changes in the network. However, algorithms that take advantage of preprocessing must reprocess the graph, which can sometimes take some time. Based on the diagram above, it takes 10 minutes for CH preprocessing step to finish, and in the meantime, new changes can happen in the road network! In contrast, Dijkstra is highly flexible, and can adapt to changes in the road network quite easily! </p>
-</div>
-</div>
-<div class="cornell-pair">
-<div class="cue">
-<p>More challenges  </p>
-</div>
-<div class="note">
-<p>There are some nuances that we didn&rsquo;t take into consideration. Lets say we wanna calculate the shortest path between two points that are far away by hours. When we start our journey, we might know that a particular road currently allows us to drive at 100 km/h. But by the time we actually reach that road, an hour or two later, traffic conditions might have changed. Maybe there&rsquo;s congestion, or maybe traffic has cleared up. In other words, we need to be able to look into future/historical speeds for the time slice other than the current timestamp. </p>
-<p>Another problem is with turn restrictions. It&rsquo;s not always allowed to take a right/left/U-turn, and it&rsquo;s not easy to represent this in normal graphs where nodes are intersections and edges connect nodes. To do that we need an edge-based graph, where nodes represent streets and edge represent turns, and all the shortest path algorithms we studied so far must be adjusted. </p>
-<p><img class="plan wide" src="../assets/eta-turn-models.png" alt="eta-visualization/turn-models.png">
-<em>Image from <a href="https://drops.dagstuhl.de/storage/01oasics/oasics-vol085-atmos2020/OASIcs.ATMOS.2020.9/OASIcs.ATMOS.2020.9.pdf">Customizable Contraction Hierarchies with Turn Costs</a> — Buchhold, Wagner, Zeitz &amp; Zündorf.</em></p>
-<p>So far, we just looked at calculating a single ETA, but many use cases need a batch of ETAs, for example calculating ETAs from all the passengers to all the drivers in an area. This is obviously more computationally demanding, and requires algorithms that are faster than simply calculating ETA for each source and destination one step at a time. </p>
-</div>
-</div>
-<div class="cornell-summary">
-<p><strong>Summary.</strong> In this post we looked at some of the challenges in calculating ETAs. There is a natural trade-off between preprocessing vs query time as well as preprocessing vs flexibility: turn restrictions, live updates, time dependency. Dealing with all these challenges on road networks with millions of nodes and edges is not trivial, but the good news is that most of the challenges introduced in this post have been extensively studied. My point was to show how a seemingly simple problem can be pretty involved under the hood.</p>
-</div>
-</div>
-    </article>
-    <p class="back"><a href="index.html">All posts</a></p>
-    </main>
-  </div>
+  <p>This post has moved to <a href="https://mehrdadmahabadi.com/blog/eta-at-scale.html">Challenges in calculating ETA at scale</a>.</p>
 </body>
 </html>

@@ -1,6 +1,7 @@
 ---
 title: ParadeDB internals, and the ORDER BY query I fixed 
 date: 2026-10-16
+redirect_from: 2026-10-16
 summary: Dive into ParadeDB internal working 
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Challenges in calculating ETA at scale
 date: 2026-11-04
+redirect_from: 2026-11-04
 image: assets/og-eta.png
 description: From Dijkstra to Contraction Hierarchies: how shortest-path algorithms power ride-hailing ETAs, visualized on a real road network.
 ---
