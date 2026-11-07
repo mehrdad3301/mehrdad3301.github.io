@@ -14,7 +14,7 @@ Write a post as posts/my-title.md:
 
 Set draft: true to keep a post out of the build.
 Set redirect_from: old-slug to keep an old URL working after a rename.
-posts/template.md is a Cornell notes draft. Copy it for a new post.
+posts/template.md is a draft. Copy it for a new post.
 
     python3 scripts/build_blog.py
 
