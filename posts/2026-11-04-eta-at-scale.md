@@ -3,7 +3,7 @@ title: Challenges in calculating ETA at scale
 date: 2026-11-04
 redirect_from: 2026-11-04
 image: assets/og-eta.png
-description: From Dijkstra to Contraction Hierarchies: how shortest-path algorithms power estimated time of arrival, and why it's challenging.
+description: From Dijkstra to Contraction Hierarchies: the challenges of calculating estimated time of arrival
 ---
 
 <div class="cornell" markdown="1">
