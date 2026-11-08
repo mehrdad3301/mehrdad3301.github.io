@@ -6,9 +6,9 @@ image: assets/og-eta-contraction-hierarchies.png
 description: From Dijkstra to Contraction Hierarchies: the challenges of calculating estimated time of arrival
 ---
 
-## Why Uber calls ETA the billion-dollar problem
-
 In this post, I'll be talking about calculating estimated times of arrival (ETA). I'll first explain why this is an important problem across various domains. Then I'll explore different approaches to calculating ETA and elaborate on where they fall short. I hope by the end of it you get a little insight into the challenges involved. It's always nice to dive deep into a problem to understand all the nitty gritty details that go into building real-world systems.
+
+## Why Uber calls ETA the billion-dollar problem
 
 Uber called ETA [a billion dollar problem](https://www.uber.com/blog/deepeta-how-uber-predicts-arrival-times/). From an outsider's point of view, ETA should just affect user experience, but there's a lot more to it. 
 
